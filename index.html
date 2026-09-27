@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EncodeX - Open-Source Data Encoding & Decoding Tool</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="brand">
+                <span class="brand-logo">⚡</span>
+                <span class="brand-name">EncodeX</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#encoding" class="nav-link active" onclick="switchTab('encoding')">Encoding</a></li>
+                <li><a href="#decoding" class="nav-link" onclick="switchTab('decoding')">Decoding</a></li>
+                <li><a href="#about" class="nav-link" onclick="switchTab('about')">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Header / Hero -->
+    <header class="hero">
+        <div class="container">
+            <h1 class="hero-title">EncodeX</h1>
+            <p class="hero-subtitle">Open-Source Data Encoding & Decoding Tool</p>
+            <p class="hero-description">
+                Visualize text encoding, binary representation, and parity-based error detection.
+            </p>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="container main-container">
+        <div class="tab-buttons">
+            <button id="tab-btn-encoding" class="tab-btn active" onclick="switchTab('encoding')">
+                <span>🔒</span> Mode Encoding
+            </button>
+            <button id="tab-btn-decoding" class="tab-btn" onclick="switchTab('decoding')">
+                <span>🔓</span> Mode Decoding
+            </button>
+            <button id="tab-btn-about" class="tab-btn" onclick="switchTab('about')">
+                <span>ℹ️</span> Tentang EncodeX
+            </button>
+        </div>
+
+        <!-- Dynamic Error Alert Box -->
+        <div id="global-alert" class="alert-box hidden">
+            <span class="alert-icon">⚠️</span>
+            <span id="alert-message" class="alert-message"></span>
+            <button class="alert-close" onclick="clearAlert()">&times;</button>
+        </div>
+
+        <!-- SECTION 1: ENCODING -->
+        <section id="section-encoding" class="tab-content active">
+            <div class="card">
+                <h2 class="card-title">Encoding Panel</h2>
+                
+                <div class="form-group">
+                    <label for="encoding-input">Enter Text:</label>
+                    <textarea id="encoding-input" rows="4" placeholder="Contoh: SALSA"></textarea>
+                </div>
+
+                <div class="options-grid">
+                    <div class="option-group">
+                        <label class="option-label">Character Encoding:</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="enc-type" value="ASCII" checked> ASCII (7-bit)
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="enc-type" value="Unicode"> Unicode
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <label class="option-label">Parity Bit:</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="enc-parity" value="None"> None
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="enc-parity" value="Even" checked> Even Parity
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="enc-parity" value="Odd"> Odd Parity
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="processEncoding()">ENCODE DATA</button>
+                    <button class="btn btn-secondary" onclick="clearEncoding()">CLEAR</button>
+                </div>
+            </div>
+
+            <!-- Hasil Encoding -->
+            <div id="encoding-result-container" class="result-container hidden">
+                <div class="card">
+                    <h3 class="card-subtitle">Hasil Encoding Per Karakter</h3>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr id="encoding-table-header">
+                                    <th>Character</th>
+                                    <th>Decimal / Code Point</th>
+                                    <th>Binary Data</th>
+                                    <th>Parity Bit</th>
+                                    <th>Final Bit</th>
+                                </tr>
+                            </thead>
+                            <tbody id="encoding-table-body"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Stream Box -->
+                    <div class="stream-box-container">
+                        <h4>FINAL BIT STREAM</h4>
+                        <div class="stream-display">
+                            <code id="final-bit-stream"></code>
+                        </div>
+                        <button id="btn-copy-stream" class="btn btn-outline" onclick="copyBitStream()">📋 COPY BIT STREAM</button>
+                    </div>
+
+                    <!-- Bit Visualization -->
+                    <div class="visualization-container">
+                        <h4>Visualisasi Bit</h4>
+                        <p class="visualization-legend">
+                            <span class="legend-badge legend-parity">P</span> = Parity Bit &nbsp;|&nbsp; 
+                            <span class="legend-badge legend-data">D</span> = Data Bit
+                        </p>
+                        <div id="bit-visualization-grid" class="bit-grid-wrapper"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: DECODING -->
+        <section id="section-decoding" class="tab-content hidden">
+            <div class="card">
+                <h2 class="card-title">Decoding Panel</h2>
+                
+                <div class="form-group">
+                    <label for="decoding-input">Enter Binary Data:</label>
+                    <textarea id="decoding-input" rows="4" placeholder="Contoh: 01010011 01000001 11001100 01010011 01000001"></textarea>
+                    <small class="help-text">Pisahkan antar blok karakter menggunakan spasi.</small>
+                </div>
+
+                <div class="options-grid">
+                    <div class="option-group">
+                        <label class="option-label">Character Encoding:</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="dec-type" value="ASCII" checked> ASCII (7-bit)
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="dec-type" value="Unicode"> Unicode
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <label class="option-label">Parity Bit:</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="dec-parity" value="None"> None
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="dec-parity" value="Even" checked> Even Parity
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="dec-parity" value="Odd"> Odd Parity
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="processDecoding()">DECODE DATA</button>
+                    <button class="btn btn-secondary" onclick="clearDecoding()">CLEAR</button>
+                </div>
+            </div>
+
+            <!-- Hasil Decoding -->
+            <div id="decoding-result-container" class="result-container hidden">
+                <div class="card">
+                    <!-- Parity Status Banner -->
+                    <div id="parity-status-banner" class="status-banner"></div>
+
+                    <h3 class="card-subtitle">Hasil Decoding Per Block</h3>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Bit Stream</th>
+                                    <th>Parity Bit</th>
+                                    <th>Data Bits</th>
+                                    <th>Parity Status</th>
+                                    <th>Decimal / Code Point</th>
+                                    <th>Character</th>
+                                </tr>
+                            </thead>
+                            <tbody id="decoding-table-body"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Output Decoded Text -->
+                    <div class="stream-box-container">
+                        <h4>Hasil Teks Dekode</h4>
+                        <div class="stream-display">
+                            <div id="decoded-text-output" class="decoded-text"></div>
+                        </div>
+                        <button id="btn-copy-decoded" class="btn btn-outline" onclick="copyDecodedText()">📋 COPY RESULT</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: ABOUT -->
+        <section id="section-about" class="tab-content hidden">
+            <div class="card">
+                <h2 class="card-title">About EncodeX</h2>
+                <p class="about-text">
+                    <strong>EncodeX</strong> adalah aplikasi web open-source untuk memvisualisasikan proses encoding dan decoding data menggunakan representasi ASCII/Unicode, binary, dan parity bit.
+                </p>
+
+                <div class="info-block">
+                    <h3>Perbedaan Encoding & Encryption</h3>
+                    <p>
+                        Encoding adalah proses mengubah representasi data ke format tertentu agar dapat diproses atau ditransmisikan secara efisien oleh sistem digital. 
+                        Encoding <strong>berbeda dengan encryption</strong> karena encoding tidak dirancang untuk menjaga kerahasiaan data dan dapat dikembalikan (decoded) oleh siapa saja tanpa memerlukan kunci rahasia.
+                    </p>
+                </div>
+
+                <div class="info-block">
+                    <h3>Mekanisme Parity Bit</h3>
+                    <p>
+                        Parity bit merupakan bit tambahan yang diletakkan di bagian depan data untuk membantu mendeteksi kemungkinan kesalahan (bit flip) saat transmisi data:
+                    </p>
+                    <ul>
+                        <li><strong>Even Parity:</strong> Memastikan jumlah total bit bernilai 1 (termasuk parity bit) bernilai GENAP.</li>
+                        <li><strong>Odd Parity:</strong> Memastikan jumlah total bit bernilai 1 (termasuk parity bit) bernilai GANJIL.</li>
+                    </ul>
+                </div>
+
+                <!-- Disclaimer Box -->
+                <div class="disclaimer-box">
+                    <div class="disclaimer-title">💡 Important Note</div>
+                    <p class="disclaimer-content">
+                        Parity bit is an error-detection mechanism, not an encryption or data-security mechanism.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 EncodeX - Open-Source Data Encoding & Decoding Tool.</p>
+            <p><small>Tugas Mata Kuliah Jaringan Komputer dan Komunikasi Data</small></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
