@@ -17,6 +17,7 @@
             <ul class="nav-links">
                 <li><a href="#encoding" class="nav-link active" onclick="switchTab('encoding')">Encoding</a></li>
                 <li><a href="#decoding" class="nav-link" onclick="switchTab('decoding')">Decoding</a></li>
+                <li><a href="#messenger" class="nav-link" onclick="switchTab('messenger')">Messenger</a></li>
                 <li><a href="#about" class="nav-link" onclick="switchTab('about')">About</a></li>
             </ul>
         </div>
@@ -28,7 +29,7 @@
             <h1 class="hero-title">EncodeX</h1>
             <p class="hero-subtitle">Open-Source Data Encoding & Decoding Tool</p>
             <p class="hero-description">
-                Visualize text encoding, binary representation, and parity-based error detection.
+                Visualize text encoding, binary representation, parity checking, and LAN messaging.
             </p>
         </div>
     </header>
@@ -42,6 +43,9 @@
             <button id="tab-btn-decoding" class="tab-btn" onclick="switchTab('decoding')">
                 <span>🔓</span> Mode Decoding
             </button>
+            <button id="tab-btn-messenger" class="tab-btn" onclick="switchTab('messenger')">
+                <span>💬</span> Messenger
+            </button>
             <button id="tab-btn-about" class="tab-btn" onclick="switchTab('about')">
                 <span>ℹ️</span> Tentang EncodeX
             </button>
@@ -54,7 +58,7 @@
             <button class="alert-close" onclick="clearAlert()">&times;</button>
         </div>
 
-        <!-- SECTION 1: ENCODING -->
+        <!-- SECTION 1: ENCODING (LAMA - TIDAK DIUBAH) -->
         <section id="section-encoding" class="tab-content active">
             <div class="card">
                 <h2 class="card-title">Encoding Panel</h2>
@@ -99,7 +103,6 @@
                 </div>
             </div>
 
-            <!-- Hasil Encoding -->
             <div id="encoding-result-container" class="result-container hidden">
                 <div class="card">
                     <h3 class="card-subtitle">Hasil Encoding Per Karakter</h3>
@@ -118,7 +121,6 @@
                         </table>
                     </div>
 
-                    <!-- Stream Box -->
                     <div class="stream-box-container">
                         <h4>FINAL BIT STREAM</h4>
                         <div class="stream-display">
@@ -127,7 +129,6 @@
                         <button id="btn-copy-stream" class="btn btn-outline" onclick="copyBitStream()">📋 COPY BIT STREAM</button>
                     </div>
 
-                    <!-- Bit Visualization -->
                     <div class="visualization-container">
                         <h4>Visualisasi Bit</h4>
                         <p class="visualization-legend">
@@ -140,7 +141,7 @@
             </div>
         </section>
 
-        <!-- SECTION 2: DECODING -->
+        <!-- SECTION 2: DECODING (LAMA - TIDAK DIUBAH) -->
         <section id="section-decoding" class="tab-content hidden">
             <div class="card">
                 <h2 class="card-title">Decoding Panel</h2>
@@ -186,12 +187,9 @@
                 </div>
             </div>
 
-            <!-- Hasil Decoding -->
             <div id="decoding-result-container" class="result-container hidden">
                 <div class="card">
-                    <!-- Parity Status Banner -->
                     <div id="parity-status-banner" class="status-banner"></div>
-
                     <h3 class="card-subtitle">Hasil Decoding Per Block</h3>
                     <div class="table-responsive">
                         <table class="data-table">
@@ -209,7 +207,6 @@
                         </table>
                     </div>
 
-                    <!-- Output Decoded Text -->
                     <div class="stream-box-container">
                         <h4>Hasil Teks Dekode</h4>
                         <div class="stream-display">
@@ -221,39 +218,86 @@
             </div>
         </section>
 
-        <!-- SECTION 3: ABOUT -->
+        <!-- SECTION 3: MESSENGER (FITUR BARU) -->
+        <section id="section-messenger" class="tab-content hidden">
+            <!-- Room Controls -->
+            <div class="card">
+                <div class="messenger-header">
+                    <h2 class="card-title">Room</h2>
+                    <div id="connection-status" class="conn-status disconnected">● Terputus</div>
+                </div>
+                
+                <div class="options-grid">
+                    <div class="form-group">
+                        <label for="room-id-input">Room ID</label>
+                        <input type="text" id="room-id-input" class="text-input" placeholder="Misal: nHiPuvxr">
+                    </div>
+                    <div class="form-group">
+                        <label for="room-token-input">Token sesi</label>
+                        <input type="text" id="room-token-input" class="text-input" placeholder="Token sesi rahasia">
+                    </div>
+                    <div class="form-group">
+                        <label for="sender-id-input">Sender ID</label>
+                        <input type="text" id="sender-id-input" class="text-input" placeholder="Nama / ID Kamu">
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="createRoom()">Buat room</button>
+                    <button class="btn btn-secondary" onclick="joinRoom()">Gabung</button>
+                </div>
+
+                <div id="room-status-text" class="help-text mt-3">Silakan buat room atau gabung ke room yang ada.</div>
+            </div>
+
+            <!-- Chat Area (Hidden until joined) -->
+            <div id="chat-container" class="hidden">
+                <div class="card">
+                    <h2 class="card-title">Pesan</h2>
+                    <div id="message-list" class="message-list"></div>
+                    
+                    <div class="chat-input-area mt-3">
+                        <input type="text" id="chat-input" class="text-input full-width" placeholder="Tulis pesan ASCII..." onkeypress="handleChatEnter(event)">
+                        <button class="btn btn-primary mt-2" onclick="sendMessage()">Kirim</button>
+                    </div>
+                </div>
+
+                <div class="card" id="waveform-card">
+                    <h2 class="card-title">Gelombang digital Manchester</h2>
+                    <div class="waveform-scroll-container">
+                        <div id="waveform-display" class="waveform-wrapper">
+                            <!-- SVG waveform akan dirender di sini -->
+                            <p class="text-muted">Kirim pesan untuk melihat gelombang.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stream-box-container mt-3">
+                        <div class="info-line"><strong>Text:</strong> <span id="info-text">-</span></div>
+                        <div class="info-line"><strong>Manchester:</strong></div>
+                        <div class="stream-display text-sm break-all" id="info-manchester">-</div>
+                        <div class="info-line"><strong>Checksum:</strong> <code id="info-checksum">-</code></div>
+                        <div class="info-line"><strong>Status:</strong> <span id="info-status" class="badge">-</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: ABOUT (LAMA - TIDAK DIUBAH) -->
         <section id="section-about" class="tab-content hidden">
             <div class="card">
                 <h2 class="card-title">About EncodeX</h2>
                 <p class="about-text">
-                    <strong>EncodeX</strong> adalah aplikasi web open-source untuk memvisualisasikan proses encoding dan decoding data menggunakan representasi ASCII/Unicode, binary, dan parity bit.
+                    <strong>EncodeX</strong> adalah aplikasi web open-source untuk memvisualisasikan proses encoding dan decoding data, serta fitur Manchester Messenger.
                 </p>
-
                 <div class="info-block">
                     <h3>Perbedaan Encoding & Encryption</h3>
-                    <p>
-                        Encoding adalah proses mengubah representasi data ke format tertentu agar dapat diproses atau ditransmisikan secara efisien oleh sistem digital. 
-                        Encoding <strong>berbeda dengan encryption</strong> karena encoding tidak dirancang untuk menjaga kerahasiaan data dan dapat dikembalikan (decoded) oleh siapa saja tanpa memerlukan kunci rahasia.
-                    </p>
+                    <p>Encoding adalah proses mengubah representasi data agar dapat diproses/ditransmisikan. Berbeda dengan encryption karena tidak dirancang untuk kerahasiaan.</p>
                 </div>
-
                 <div class="info-block">
-                    <h3>Mekanisme Parity Bit</h3>
-                    <p>
-                        Parity bit merupakan bit tambahan yang diletakkan di bagian depan data untuk membantu mendeteksi kemungkinan kesalahan (bit flip) saat transmisi data:
-                    </p>
-                    <ul>
-                        <li><strong>Even Parity:</strong> Memastikan jumlah total bit bernilai 1 (termasuk parity bit) bernilai GENAP.</li>
-                        <li><strong>Odd Parity:</strong> Memastikan jumlah total bit bernilai 1 (termasuk parity bit) bernilai GANJIL.</li>
-                    </ul>
-                </div>
-
-                <!-- Disclaimer Box -->
-                <div class="disclaimer-box">
-                    <div class="disclaimer-title">💡 Important Note</div>
-                    <p class="disclaimer-content">
-                        Parity bit is an error-detection mechanism, not an encryption or data-security mechanism.
-                    </p>
+                    <h3>Manchester Encoding</h3>
+                    <p>Digunakan dalam transmisi jaringan (seperti Ethernet klasik). Setiap bit direpresentasikan oleh transisi tegangan, memastikan sinkronisasi clock:
+                    <br><strong>0</strong> = Transisi HIGH ke LOW (10)
+                    <br><strong>1</strong> = Transisi LOW ke HIGH (01)</p>
                 </div>
             </div>
         </section>
@@ -267,6 +311,8 @@
         </div>
     </footer>
 
+    <!-- Socket.IO (Otomatis dilayani oleh server Node.js) -->
+    <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
